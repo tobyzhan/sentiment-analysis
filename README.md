@@ -1,46 +1,100 @@
-### 2024 BIG DATA HACKATHON PROPOSAL FORM
+# HCAHPS Patient Survey Sentiment Analysis 🏥
 
-#### Team Number: `227`  
+A machine learning pipeline that performs sentiment analysis on California HCAHPS (Hospital Consumer Assessment of Healthcare Providers and Systems) patient survey data. Used for 2024 SDSU Big Data Hackathon
 
-#### Team Name: `LEKT`    
-  
-#### Your team's hackathon idea in One sentence:
-##### `We are addressing health access disparities from underserved populations and communities (i.e. education, transportation, English proficiency, elderly, etc.) by giving a personalized healthcare plan, including healthcare resources and information, based on user inputted demographic information.`
+---
 
+## What It Does
 
-#### A visual
-![bigdatahackathon4sd](https://github.com/BigDataForSanDiego/bigdataforsandiego.github.io/blob/main/templates/img/bigdatahackathon_sd_2024.png?raw=true "Big Data Hackathon for San Diego 2024")
-<img height="10%" width="50%" alt="HDMA" src="https://github.com/BigDataForSanDiego/bigdataforsandiego.github.io/blob/main/templates/img/hdma2.png?raw=true"> 
+- Loads and preprocesses California HCAHPS survey data
+- Uses **TextBlob** to compute sentiment polarity scores on survey questions
+- Categorizes responses as **Positive**, **Neutral**, or **Negative** based on answer percentages
+- Trains a **Logistic Regression** classifier combining TF-IDF text features with numeric survey features
+- Visualizes results with confusion matrices, scatter plots, and sentiment distribution bar charts
 
-<!--
-#### Theme: Enhancing Healthcareâ€™s Digital Front Door
-#### - Digital solutions to help increase access, manage health, and improve patient satisfaction along the healthcare journey -  
--->
+---
 
-#### Hackathon Five CORE Themes. `CHECK ONE or TWO QUESTIONS (insert X in [ ])`.
-- [X] Access to care
-> How can we make it easier to access care (especially specialists) and provide clear, timely notifications, and reminders along their healthcare journey?
-- [ ] Patient satisfaction
-> How can we make it more convenient for patients to provide real-time feedback about their healthcare experience through a mobile app?
-- [X] New patient experience
-> As a potential new customer, how can we leverage the mobile app to help new patients better understand what services are available to them?
-- [ ] Managing my health
-> Itâ€™s easy to get overwhelmed by all the tasks patients often have to do to maintain their health, how can we make managing health more enjoyable?
-- [ ] Addressing mental health challenges
-> Mental health challenges may be difficult to identify and have a broad impact on health, how can we help clinicians be more in tune with patients mental health needs?
+## Dataset
 
-#### Optional Questions. `TEAMS CAN SELECT ONE ADDITIONAL OPTIONAL QUESTION (insert X in [ ])`
-- [X] Cultural Competence in Healthcare
-> How can we design a mobile app that helps healthcare providers better understand and respect cultural differences, improving communication and care for diverse patient populations?
-- [X] Access to Care for Rural and Remote Communities
-> How can we leverage technology to improve healthcare access for rural and remote communities, ensuring timely and specialized care for those in underserved areas? (Focus on SDSU Imperial Valley Connection - Rural/Remote)
-- [ ] Enhancing disease prevention (For Geocomputational Thinker Awards)
-> How can big (geospatial) data analytics and AI be used to improve access to information about the influence of human behavior, cultural practices, and social interactions on the spread of diseases?
-- [ ] Addressing environmental health disparities (For Geocomputational Thinker Awards)
-> How can we leverage big (geospatial) data analytics and AI to improve access to resources that mitigate the impact of environmental factors, i.e. pollution, on health disparities?
+**File:** `Patient Survey HCAHPS California.csv`
 
+Key columns used:
+| Column | Description |
+|---|---|
+| `HCAHPS Question` | The survey question text |
+| `HCAHPS Answer Percent` | Percentage of respondents giving that answer |
+| `Number of Completed Surveys` | Total survey count for that hospital |
 
-#### Team Coordinator GitHub Username: `kylama`
+---
 
-#### Team Members: `Kyla Ma (kylama), Toby Zhang (tobyzhan), Eric Gan (Eri-gon2), Lisa Nguyen (lisanguyenn)`
+## Pipeline
 
+```
+Raw CSV
+  ↓
+TextBlob sentiment polarity scoring
+  ↓
+Rule-based sentiment labeling (based on Answer Percent)
+  ↓
+TF-IDF vectorization of question text
+  ↓
+Combine with numeric features (sparse matrix)
+  ↓
+Logistic Regression classifier
+  ↓
+Evaluation + Visualizations
+```
+
+---
+
+## Sentiment Labeling Rules
+
+| Answer Percent | Label |
+|---|---|
+| ≥ 70% | Positive |
+| 20% – 69% | Neutral |
+| < 20% | Negative |
+
+---
+
+## Model
+
+- **Algorithm:** Logistic Regression (`max_iter=10000`)
+- **Text features:** TF-IDF (`max_features=5000`)
+- **Numeric features:** Number of Completed Surveys
+- **Combination:** Sparse matrix horizontal stack (`scipy.sparse.hstack`)
+- **Train/test split:** 80/20
+
+---
+
+## Visualizations
+
+1. **Confusion Matrix** — Heatmap of predicted vs true sentiment labels
+2. **Scatter Plot** — Sentiment Score vs Answer Percentage, point size scaled by number of respondents
+3. **Bar Chart** — Sentiment distribution with sample survey questions annotated above each bar
+
+---
+
+## Requirements
+
+```bash
+pip install pandas numpy scikit-learn scipy textblob matplotlib seaborn
+python -m textblob.download_corpora
+```
+
+---
+
+## Usage
+
+1. Place `Patient Survey HCAHPS California.csv` in the same directory as the notebook
+2. Open `sentiment_analysis.ipynb` in Jupyter or VS Code
+3. Run all cells top to bottom
+
+---
+
+## Results
+
+The model outputs:
+- Accuracy score
+- Full classification report (precision, recall, F1 per class)
+-
